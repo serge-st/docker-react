@@ -1,0 +1,36 @@
+# To build an image using non-standard Dockerfile use this command:
+# docker build -f Dockerfile.dev -t <image name> .
+
+# use -v to map local directories to the container
+# in this case we use two different volumes:
+# "-v /app/node_modules" tells docker to use the node_modules folder version that he has inside the container
+
+# "-v $(pwd):/app" map the current working directory (project's location on the local device) and after ":" we specify where this directory should be used
+docker run -p 3000:3000 -v /app/node_modules -v $(pwd):/app <CONTAINER ID>
+
+# The above command probably won't run on Windows:
+# https://docs.docker.com/docker-for-windows/wsl/
+
+# 1. Have Windows Subsystem for Linux installed
+# 2. Go To: Settings -> Resources -> WSL INTEGRATION and enable Ubuntu
+# 3. wsl -l -v (make sure the default Subsystem has version 2 (wsl --set-version Ubuntu 2))
+# 4. run "wsl" (will switch you to the Subsystem as root)
+# 5. run docker command (to enable live reload add "-e CHOKIDAR_USEPOLLING=true" argument before the <CONTAINER ID>)
+# 6. alternative to 5. (create a ".env" file in the project's root directory and add "CHOKIDAR_USEPOLLING=true" inside it)
+
+# to run docker compose just write:
+docker-compose up/down
+
+# TESTING
+# We can build the container and then run different script (other than the one which is marked as CMD in the Dockerfile):
+docker build -f Dockerfile.dev .
+docker run <container ID> npm run test
+
+# if you want to be able to interact with the container via CLI - add "-it" flag after docker run:
+docker run -it <container ID> npm run test
+
+
+# you can run the container with docker-compose and then in another terminal window execute tests from the same container by:
+docker ps           # to get the running container's ID
+docker exec -it <container ID> npm run tets 
+# in the case above docker container will recognise on the fly all the changes made to App.test.js file

@@ -1,0 +1,29 @@
+version: '3'
+services: 
+    web:
+        # if we are using the standard Dockerfile then we would just specify "build: ."
+        build:
+            # context parameter specifies the location of the files we want to use in the build
+            context: .
+            dockerfile: Dockerfile.dev
+        ports:
+            # map port 81 outside the container to 3000 inside it
+            - "81:3000"
+        volumes:
+            # the bellow pretty much says do not try to map a folder outside of container to "/app/node_modules" so docker image will use the node_modules folder found inside it
+            - /app/node_modules
+            # map all the folders in our project's root director to "/app" folder
+            - .:/app
+        environment:
+            # the bellow can be used instead of .env file
+            - CHOKIDAR_USEPOLLING=true
+    # # ! OPTIONAL solution for testing
+    # tests:
+    #     build:
+    #         context: .
+    #         dockerfile: Dockerfile.dev
+    #     volumes:
+    #         - /app/node_modules
+    #         - .:/app
+    #     # override the starting command (CMD in the Dockerfile)
+    #     command: ["npm", "run", "test"]
